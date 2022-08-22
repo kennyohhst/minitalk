@@ -2,16 +2,25 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 //assign number to SIGUSR1 / SIGUSR2
 void	sigusr_assign(int i, int pid)
 {
 	if (i == 0)
+	{
 		kill(pid, SIGUSR1);
-		// printf("IT WAS ZEROOOO : %d\n", i);
+		write(1, "0", 2);
+		write(1, "\n", 1);
+
+	}
 	if (i == 1)
+	{
 		kill(pid, SIGUSR2);
-		// printf("IT WAS ONEEEEE : %d\n", i);
+		write(1, "1", 2);
+		write(1, "\n", 1);
+	}
+	usleep(50);
 }
 
 //change nbr into binary
@@ -41,7 +50,6 @@ int main(int argc, char **argv)
 		i++;
 	}
 	// printf("this went better than expected :'D \n");
-	while (1)
-		pause();
+
 	return (0);
 }

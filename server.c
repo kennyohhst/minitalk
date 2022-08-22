@@ -1,39 +1,65 @@
 #include "minitalk.h"
 #include <signal.h>
+#include <stdlib.h>
+
+void	convert(char *str)
+{
+	char	*s;
+	int		i;
+	int		x;
+	int		neg;
+
+	s = (char *) str;
+	i = 0;
+	x = 0;
+	neg = 1;
+	while (s[i] && (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13)))
+		i++;
+	while (s[i] && (s[i] == '0' || s[i] == '1'))
+	{
+		x = (x * 2) + (s[i] - 48);
+		i++;
+	}
+	return (x);
+}
 
 void    ft_handle_sig(int signum)
 {
-	if (1 || signum)
-		printf("\n\nhello\n\n");
+	char	*str;
+	int		i;
 
-    // if (signum == SIGUSR1)
-    // {
-    //     printf("you used sigusr1\n");
-    //     // write(1, "0", 2);
-    //     // write(1, "\n", 2);
-    // }  
-    // if (signum == SIGUSR2)
-    // {    
-    //     // printf("you used sugusr2\n");
-    //     write(1, "2", 2);
-    //     write(1, "\n", 2);
-    // }
+	i = 0;
+	str = calloc(8, sizeof(char));
+	if (!str)
+		return ;
+	if (signum == SIGUSR1)
+        str[i] = '0';
+	if (signum == SIGUSR2)    
+        str[i] = '1';
+	i++;
+	
+	if (i == 8)
+	{
+		free(str);
+		return (convert(str));
+	}
 }
 
 int main(void)
 {
     pid_t               mypid;
-    struct sigaction    my_act = { 0 };
-
-    // signal(SIGUSR1, ft_handle_sig);
-    // signal(SIGUSR2, ft_handle_sig);
-    my_act.sa_handler = &ft_handle_sig;
-    sigaction(SIGUSR2, &my_act, NULL);
-    sigaction(SIGUSR1, &my_act, NULL);
+    struct sigaction    my_act;
 
     mypid = getpid();
+
+
     printf("This is my PID: %d\n", mypid);
 
     while (1)
+	{
+	    my_act.sa_handler = &ft_handle_sig;
+	    sigaction(SIGUSR1, &my_act, NULL);
+	    sigaction(SIGUSR2, &my_act, NULL);
         pause();
+	}
 }
