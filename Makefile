@@ -7,7 +7,7 @@ OBJ = $(SRC:.c=.o)
 all: $(NAME)
 
 $(OBJ):
-	gcc -c $(FLAGS) $(SRC)
+	gcc -c -g $(FLAGS) $(SRC)
 
 $(NAME): $(OBJ)
 	ar rc $(NAME) $(OBJ)
