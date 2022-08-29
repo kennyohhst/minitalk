@@ -1,13 +1,13 @@
 NAME = minitalk.a
 FLAGS = -Wall -Werror -Wextra
-SRC = server.c
+SRC = server.c client.c
 HEAD = minitalk.h
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
 $(OBJ):
-	gcc -c -g $(FLAGS) $(SRC)
+	gcc -c $(FLAGS) $(SRC)
 
 $(NAME): $(OBJ)
 	ar rc $(NAME) $(OBJ)
@@ -19,5 +19,5 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean all
-	
+
 .PHONY: clean fclean re all

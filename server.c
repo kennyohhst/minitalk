@@ -2,47 +2,36 @@
 #include <signal.h>
 #include <stdlib.h>
 
-void	convert(char *str)
+void	ft_putchar(char c)
 {
-	char	*s;
-	int		i;
-	int		x;
-	int		neg;
+		write(1, &c, 1);
+}
 
-	s = (char *) str;
-	i = 0;
-	x = 0;
-	neg = 1;
-	while (s[i] && (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13)))
-		i++;
-	while (s[i] && (s[i] == '0' || s[i] == '1'))
-	{
-		x = (x * 2) + (s[i] - 48);
-		i++;
-	}
-	return (x);
+void	ft_putnbr(long long i)
+{
+	if (i >= 10)
+		ft_putnbr(i / 10);
+	ft_putchar((i % 10) + '0');
 }
 
 void    ft_handle_sig(int signum)
 {
-	char	*str;
-	int		i;
+	static unsigned char	sig = '\0';
+	static int				count_bit = 8;
 
-	i = 0;
-	str = calloc(8, sizeof(char));
-	if (!str)
-		return ;
 	if (signum == SIGUSR1)
-        str[i] = '0';
-	if (signum == SIGUSR2)    
-        str[i] = '1';
-	i++;
-	
-	if (i == 8)
+		sig = sig | 0;
+	else
+		sig = sig | 1;
+	count_bit--;
+	if (count_bit == 0)
 	{
-		free(str);
-		return (convert(str));
+		write(STDOUT_FILENO, &sig, 1);
+		count_bit = 8;
+		sig = '\0';
 	}
+	else
+		sig <<= 1;
 }
 
 int main(void)
@@ -51,15 +40,16 @@ int main(void)
     struct sigaction    my_act;
 
     mypid = getpid();
-
-
-    printf("This is my PID: %d\n", mypid);
-
+	write(STDOUT_FILENO, "This is my PID: ", 17);
+	ft_putnbr(mypid);
+	write(STDOUT_FILENO, "\n", 1);
     while (1)
 	{
-	    my_act.sa_handler = &ft_handle_sig;
+		my_act.sa_handler = &ft_handle_sig;
+		my_act.sa_flags = SA_SIGINFO | SA_NODEFER;
 	    sigaction(SIGUSR1, &my_act, NULL);
 	    sigaction(SIGUSR2, &my_act, NULL);
         pause();
 	}
+	return (0);
 }

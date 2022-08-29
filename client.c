@@ -4,31 +4,47 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//assign number to SIGUSR1 / SIGUSR2
-void	sigusr_assign(int i, int pid)
+int	ft_atoi(const char *str)
 {
-	if (i == 0)
-	{
-		kill(pid, SIGUSR1);
-		write(1, "0", 2);
-		write(1, "\n", 1);
+	char	*s;
+	int		i;
+	int		x;
 
-	}
-	if (i == 1)
+	s = (char *) str;
+	i = 0;
+	x = 0;
+	if (!str)
+		return (0);
+	while (s[i] && (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13)))
+		return (0);
+	if (s[i] && (s[i] == '+' || s[i] == '-'))
+		return (0);
+	while (s[i] && s[i] >= '0' && s[i] <= '9')
 	{
-		kill(pid, SIGUSR2);
-		write(1, "1", 2);
-		write(1, "\n", 1);
+		x = (x * 10) + (s[i] - '0');
+		i++;
 	}
-	usleep(50);
+	return (x);
 }
 
-//change nbr into binary
-void	ft_putnbr_fd(int n, int pid)
+void	ft_send_bit(int n, int count, int pid)
 {
-	if (n >= 2)
-		ft_putnbr_fd(n / 2, pid);
-	sigusr_assign(n % 2, pid);
+	int killcheck;
+
+	killcheck = 0;
+	if (count == 0)
+		return;
+	ft_send_bit(n >> 1, count - 1, pid);
+	if (!(n & 1))
+		killcheck = kill(pid, SIGUSR1);
+	else
+		killcheck = kill(pid, SIGUSR2);
+	if (killcheck < 0)
+	{
+		write(STDOUT_FILENO, "Error, check PID", 17);
+		exit(1);
+	}
+	usleep(500);
 }
 
 int main(int argc, char **argv)
@@ -36,20 +52,16 @@ int main(int argc, char **argv)
 	int i;
 	int pid;
 	
-	
 	i = 0;
-	pid = atoi(argv[1]);
-	// printf("%s\n", argv[2]);
-	// kill(pid, SIGUSR2);
-	// if (argc == 3)
-		// printf("first : %s\nsecond : %s\nturd: %s\n", argv[0], argv[1], argv[2]);
-
+	pid = ft_atoi(argv[1]);
+	if (argc != 3)
+		return (write(STDOUT_FILENO, "NOT ENOUGH ARGUMENTS", 21));
+	if (pid <= 0)
+		return (write(STDOUT_FILENO, "PID ERROR", 10));
 	while (argv[2][i] != '\0')
 	{
-		ft_putnbr_fd(argv[2][i], pid);		
+		ft_send_bit(argv[2][i], 8, pid);
 		i++;
 	}
-	// printf("this went better than expected :'D \n");
-
 	return (0);
 }
