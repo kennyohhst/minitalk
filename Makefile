@@ -1,19 +1,23 @@
-NAME = minitalk.a
+GCC = cc
+NAME = server client
 FLAGS = -Wall -Werror -Wextra
-SRC = server.c client.c
-HEAD = minitalk.h
-OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
-$(OBJ):
-	gcc -c $(FLAGS) $(SRC)
+client: client.o
+	$(GCC) -o client client.o
 
-$(NAME): $(OBJ)
-	ar rc $(NAME) $(OBJ)
+server: server.o
+	$(GCC) -o server server.o
+
+client.o: client.c
+	$(GCC) $(FLAGS) -c client.c -o client.o
+
+server.o: server.c
+	$(GCC) $(FLAGS) -c server.c -o server.o
 
 clean:
-	rm -f $(OBJ)
+	rm -f *.o
 
 fclean: clean
 	rm -rf $(NAME)

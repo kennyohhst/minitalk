@@ -1,8 +1,18 @@
-#include <signal.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <stdlib.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kkalika <kkalika@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/08/29 15:17:45 by kkalika           #+#    #+#             */
+/*   Updated: 2022/08/29 17:59:06 by kkalika          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
 
 int	ft_atoi(const char *str)
 {
@@ -13,7 +23,7 @@ int	ft_atoi(const char *str)
 	s = (char *) str;
 	i = 0;
 	x = 0;
-	if (!str)
+	if (!s)
 		return (0);
 	while (s[i] && (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13)))
 		return (0);
@@ -29,11 +39,11 @@ int	ft_atoi(const char *str)
 
 void	ft_send_bit(int n, int count, int pid)
 {
-	int killcheck;
+	int	killcheck;
 
 	killcheck = 0;
 	if (count == 0)
-		return;
+		return ;
 	ft_send_bit(n >> 1, count - 1, pid);
 	if (!(n & 1))
 		killcheck = kill(pid, SIGUSR1);
@@ -42,20 +52,22 @@ void	ft_send_bit(int n, int count, int pid)
 	if (killcheck < 0)
 	{
 		write(STDOUT_FILENO, "Error, check PID", 17);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	usleep(500);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	int i;
-	int pid;
-	
+	int	i;
+	int	pid;
+
 	i = 0;
 	pid = ft_atoi(argv[1]);
-	if (argc != 3)
+	if (argc < 3)
 		return (write(STDOUT_FILENO, "NOT ENOUGH ARGUMENTS", 21));
+	if (argc > 3)
+		return (write(STDOUT_FILENO, "TOO MANY ARGUMENTS", 19));
 	if (pid <= 0)
 		return (write(STDOUT_FILENO, "PID ERROR", 10));
 	while (argv[2][i] != '\0')
